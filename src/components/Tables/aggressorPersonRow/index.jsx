@@ -1,6 +1,25 @@
 import React from 'react';
+import {FaTrashAlt} from "react-icons/fa";
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrentAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
 
-const AggressorPersonRow = ({name, lastname, level, grade}) => {
+const AggressorPersonRow = ({id, name, lastname, level, grade}) => {
+
+    const dispacth = useDispatch();
+    const agrressorPersonCurrent = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
+    console.log(agrressorPersonCurrent);
+    const newAgrressorPersonCurrent = agrressorPersonCurrent?.filter((person) => {
+        if (person?.peie_id &&  person?.peie_id !== id) {
+            return person
+        }else if(person?.alum_id && person?.alum_id !== id){
+            return person
+        }
+        // return  person?.peie_id != id || person?.alum_id != id 
+    });
+    const handleDeleteAgrressor = () => {
+        console.log(newAgrressorPersonCurrent);
+        dispacth(setCurrentAgrressorPersons(newAgrressorPersonCurrent))
+    }
 
     return (
         <li className="item-direction item-container-direction" >
@@ -19,7 +38,7 @@ const AggressorPersonRow = ({name, lastname, level, grade}) => {
                     <FaEye onClick={handleDetailDirection} />
                     <FaEdit onClick={handleEditDirection} />
                 </More> */}
-                nada
+                <FaTrashAlt role="button" onClick={handleDeleteAgrressor}/>
             </div>
         </li>
     )

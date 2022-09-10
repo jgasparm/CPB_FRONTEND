@@ -37,6 +37,13 @@ const HintInput = styled.span`
   line-height: 32px;
   color: #503e9d;
 `;
+
+const SelectOption = styled.select`
+  width: 320px;
+  height: 35px;
+  border-radius: 4px;
+`;
+
 const Input = styled.input`
   /* max-width: 516px; */
   height: 60px;
@@ -65,6 +72,7 @@ export {
   IncidenceFormContainer,
   InputContainer,
   HintInput,
+  SelectOption,
   Input,
   FooterButton,
 };

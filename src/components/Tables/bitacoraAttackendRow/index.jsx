@@ -1,6 +1,19 @@
 import React from 'react';
+import {FaEye, FaTrashAlt} from "react-icons/fa";
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrentAttackendPersons, setCurrentBitacoraAttackendPersons } from '../../../app/features/attackendPerson/attackendPerson';
+const BitacoraAttackendRow = ({id, name, lastname, level, grade, setAvailable}) => {
 
-const BitacoraAttackendRow = ({name, lastname, level, grade}) => {
+    const dispacth = useDispatch();
+    const bitacoraAttackendPersonCurrent = useSelector(state => state.attackendPerson?.currentBitacoraAttackendPersons);
+    console.log(bitacoraAttackendPersonCurrent);
+    const deleteBitacoraAttackendPersonCurrent = bitacoraAttackendPersonCurrent?.filter((person) => person.alum_id != id);
+
+    const handleDeleteAttackend = () => {
+        dispacth(setCurrentBitacoraAttackendPersons(deleteBitacoraAttackendPersonCurrent))
+        setAvailable(false)
+    }
+
     return (
         <li className="item-direction item-container-direction" >
             <div style={{ cursor: "pointer" }} className="attribute-direction" data-name="Nombres">{name}</div>
@@ -18,7 +31,7 @@ const BitacoraAttackendRow = ({name, lastname, level, grade}) => {
                     <FaEye onClick={handleDetailDirection} />
                     <FaEdit onClick={handleEditDirection} />
                 </More> */}
-                nada
+                <FaTrashAlt role="button" onClick={handleDeleteAttackend}/>
             </div>
         </li>
     )

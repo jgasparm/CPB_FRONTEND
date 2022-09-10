@@ -1,7 +1,18 @@
 import React from 'react';
+import {FaTrashAlt} from "react-icons/fa";
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrentAttackendPersons } from '../../../app/features/attackendPerson/attackendPerson';
 
-const AttackendPersonRow = ({name, lastname, level, grade}) => {
+const AttackendPersonRow = ({id, name, lastname, level, grade}) => {
 
+    const dispacth = useDispatch();
+    const attackendPersonCurrent = useSelector(state => state.attackendPerson?.currentAttackendPersons);
+    console.log(attackendPersonCurrent);
+    const newAttackendPersonCurrent = attackendPersonCurrent?.filter((person) => person.alum_id != id);
+
+    const handleDeleteAttackend = () => {
+        dispacth(setCurrentAttackendPersons(newAttackendPersonCurrent))
+    }
     return (
         <li className="item-direction item-container-direction .item-container-row" >
             <div style={{ cursor: "pointer" }} className="attribute-direction" data-name="Nombres">{name}</div>
@@ -19,7 +30,7 @@ const AttackendPersonRow = ({name, lastname, level, grade}) => {
                     <FaEye onClick={handleDetailDirection} />
                     <FaEdit onClick={handleEditDirection} />
                 </More> */}
-                nada
+                <FaTrashAlt role="button" onClick={handleDeleteAttackend}/>
             </div>
         </li>
     )

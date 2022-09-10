@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import SeacrhInicidentsRow from '../../components/Tables/searchIncidentsRow';
+import { FaSearch } from "react-icons/fa";
 import './tablequeriesIncidents.scss';
 import { Container, ContentBox, ContentSelect, Form, HintInput, IncidenceFormContainer, Input, SectionSearch, SelectOption } from './style';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { setAllQueryIncidences } from '../../app/features/queryIncidence/queriesIncidence';
 
 const QueriesIncidents = () => {
+
+    const queriesIncidents = useSelector(state => state.queryIncidence?.allQueryIncidences);
+    const { handleSubmit, register, control, formState: { errors } } = useForm({})
+    const dispacth = useDispatch();
     const [attackendsPerson, setIncidentsPerson] = useState([
         // {
         //     id: "1",
@@ -25,76 +34,110 @@ const QueriesIncidents = () => {
         // }
     ]);
 
+    const onSubmit = async (data) => {
+        dispacth(setAllQueryIncidences(null));
+        console.log(data);
+        const params = "ac_inci_origen=" + data.selectOrigen + "&ac_inci_tipo=" + data.selectTipo + "&ai_insu_id=" + data.selectSubtipo +
+            "&ai_inmo_id=" + data.selectMotivo + "&ac_inci_lugar=" + data.selectLugar + "&ac_fecha_inicial=" +
+            data.dateInicial + "&ac_fecha_final=" + data.dateFinal;
+
+        await axios("http://localhost:80/wsCodeigniterCPB/wsConsultaIncidencias.php?" + params + "", {
+            mode: "cors",
+            method: "GET",
+            headers: { 
+                "Accept": "application/json;charset=utf-8"
+            },
+        }).then((res) => {
+            // console.log(res.data);
+            dispacth(setAllQueryIncidences(res.data));
+        })
+
+    }
     return (
         <Container>
-            <Form>
-                <h5 className="text-center mb-4">Consulta de incidencias</h5>
+            <Form id='formConsulta' onSubmit={handleSubmit(onSubmit)}>
+                <h4 className="text-center mb-4">Consulta de incidencias</h4>
                 <SectionSearch>
                     <ContentSelect>
                         <ContentBox>
                             <HintInput>Origen de incidencia</HintInput>
-                            <SelectOption>
-                                <option value="">--Seleccione--</option>
-                                <option value="">Personal IE a escolares</option>
-                                <option value="">Entre escolares</option>
+                            <SelectOption
+                                {...register("selectOrigen")}
+                            >
+                                <option value="">--seleccione--</option>
+                                <option value="1">Personal IE a escolares</option>
+                                <option value="2">Entre escolares</option>
                             </SelectOption>
-                        </ContentBox>                        
+                        </ContentBox>
                     </ContentSelect>
                     <ContentSelect>
                         <ContentBox>
                             <HintInput>Tipo de incidencia</HintInput>
-                            <SelectOption>
-                                <option value="">--Seleccione--</option>
-                                <option value="">Física</option>
-                                <option value="">Psicológica</option>
-                                <option value="">Sexual</option>
+                            <SelectOption
+                                {...register("selectTipo")}
+                            >
+                                <option value="">--seleccione--</option>
+                                <option value="1">Física</option>
+                                <option value="2">Psicológica</option>
+                                <option value="3">Sexual</option>
                             </SelectOption>
                         </ContentBox>
                         <ContentBox>
                             <HintInput>Subtipo de incidencia</HintInput>
-                            <SelectOption>
-                                <option value="">--Seleccione--</option>
-                                <option value="">Con lesiones</option>
-                                <option value="">Sin lesiones</option>
-                                <option value="">Castigo físico</option>
+                            <SelectOption
+                                {...register("selectSubtipo")}
+                            >
+                                <option value="">--seleccione--</option>
+                                <option value="1">Con lesiones</option>
+                                <option value="2">Sin lesiones</option>
+                                <option value="3">Castigo físico</option>
                             </SelectOption>
                         </ContentBox>
                         <ContentBox>
                             <HintInput>Rango inicial</HintInput>
-                            <Input type="date"></Input>
+                            <Input type="date"
+                                {...register("dateInicial")}
+                            ></Input>
                         </ContentBox>
                     </ContentSelect>
                     <ContentSelect>
                         <ContentBox>
                             <HintInput>Motivo de incidencia</HintInput>
-                            <SelectOption>
-                                <option value="">--Seleccione--</option>
-                                <option value="">Sin motivo alguno, sólo por molestar o por burlarse</option>
-                                <option value="">Por su forma de hablar o expresarse</option>
-                                <option value="">Por su ritmo o estilo de aprendizaje</option>
+                            <SelectOption
+                                {...register("selectMotivo")}
+                            >
+                                <option value="">--seleccione--</option>
+                                <option value="1">Sin motivo alguno, sólo por molestar o por burlarse</option>
+                                <option value="2">Por su forma de hablar o expresarse</option>
+                                <option value="3">Por su ritmo o estilo de aprendizaje</option>
                             </SelectOption>
                         </ContentBox>
                         <ContentBox>
                             <HintInput>Lugar de incidencia</HintInput>
-                            <SelectOption>
-                                <option value="">--Seleccione--</option>
-                                <option value="">Patio principal</option>
-                                <option value="">En el aula</option>
-                                <option value="">En el baño</option>
+                            <SelectOption
+                                {...register("selectLugar")}
+                            >
+                                <option value="">--seleccione--</option>
+                                <option value="1">Patio principal</option>
+                                <option value="2">En el aula</option>
+                                <option value="3">En el baño</option>
                             </SelectOption>
                         </ContentBox>
                         <ContentBox>
                             <HintInput>Rango final</HintInput>
-                            <Input type="date"></Input>
+                            <Input type="date"
+                                {...register("dateFinal")}
+                            ></Input>
                         </ContentBox>
                     </ContentSelect>
                     <div className='mt-2 d-flex justify-content-end'>
-                                <button className='btn btn-sm btn-secondary bg-gradient'
-                                    onClick={(e) => {
-                                    }}>
-                                        Consultar
-                                </button>
-                            </div>
+                        <input className='btn btn-sm btn-secondary bg-gradient'
+                            form='formConsulta'
+                            type='submit'
+                            value="Consultar"
+                        >
+                        </input>
+                    </div>
                 </SectionSearch>
                 <div className="my-3">
                     <div>
@@ -109,15 +152,16 @@ const QueriesIncidents = () => {
                                 <div className="attribute-title-incidents">Subtipo de incidencia</div>
                                 <div className="attribute-title-incidents">Acciones</div>
                             </li>
-                            {attackendsPerson.map((person, index) => (
+                            {queriesIncidents?.map((person, index) => (
                                 <SeacrhInicidentsRow
                                     key={index}
-                                    name={person.name}
-                                    lastname={person.lastname}
-                                    level={person.level}
-                                    grade={person.grade}
-                                    typeIncident={person.typeIncident}
-                                    subTypeIncident={person.subTypeIncident}
+                                    id={person.inci_id}
+                                    name={person?.subtipo_incidencia}
+                                    lastname={person?.inci_detalle}
+                                    level={person?.level}
+                                    grade={person?.origen_descripcion}
+                                    typeIncident={person?.lugar_incidencia}
+                                    subTypeIncident={person?.tipo_incidencia}
                                 />
                             ))}
                         </ol>

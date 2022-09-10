@@ -48,6 +48,10 @@ li{
   display: block;
   height: 38px;
 }
+.menu-left-link span{
+  display: block;
+  height: 38px;
+}
 .menu-left-link a:hover{
   border-radius: 3px;
   padding-left: 3px;
@@ -65,8 +69,12 @@ li{
     height: 8px;    /* Tamaño del scroll en horizontal */
 }
 .content-view-section::-webkit-scrollbar-thumb {
-    background: rgba(158, 158, 158, 0.589);
+    background: rgba(3, 117, 188, 0.589);
     border-radius: 4px;
+}
+
+.accordion-link{
+  padding: 2px 5px 5px 8px;
 }
 /* #root {
   max-width: 1280px;

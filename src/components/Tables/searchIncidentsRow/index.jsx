@@ -1,6 +1,17 @@
 import React from 'react';
+import {FaEye} from "react-icons/fa";
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrentQueryIncidences } from '../../../app/features/queryIncidence/queriesIncidence';
 
-const SeacrhInicidentsRow = ({name, lastname, level, grade, typeIncident, subTypeIncident}) => {
+const SeacrhInicidentsRow = ({id, name, lastname, level, grade, typeIncident, subTypeIncident}) => {
+    const dispacth = useDispatch();
+    const indidence = useSelector(state => state.queryIncidence?.allQueryIncidences)?.find(
+        (incidence) => incidence.inci_id === id);
+    const handleDetailincidents = () => {
+        // dispacth(id);
+        dispacth(setCurrentQueryIncidences(indidence));
+    }
+
     return (
         <li className="item-incidents item-container-incidents .item-container-row" >
             <div style={{ cursor: "pointer" }} className="attribute-incidents" data-name="Nombres">{name}</div>
@@ -17,10 +28,10 @@ const SeacrhInicidentsRow = ({name, lastname, level, grade, typeIncident, subTyp
             </div>
             <div className="attribute-incidents" data-name="Acciones">
                 {/* <More>
-                    <FaEye onClick={handleDetailincidents} />
+                    
                     <FaEdit onClick={handleEditincidents} />
                 </More> */}
-                nada
+                <FaEye role="button" onClick={handleDetailincidents} />
             </div>
         </li>
     )
