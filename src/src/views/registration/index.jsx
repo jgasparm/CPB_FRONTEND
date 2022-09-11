@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { setAllAgrressorPersons, setCurrentAgrressorPersons } from "../../app/features/aggressorPerson/agrressorPerson";
-import { setAllAttackendPersons } from "../../app/features/attackendPerson/attackendPerson";
+import { setAllAttackendPersons, setAllCpbBitacoraAttackendPersons } from "../../app/features/attackendPerson/attackendPerson";
 import ModalAggressorPerson from "../../components/modals/modalAggressorPerson";
 import ModalAggressorStaff from "../../components/modals/modalAggressorStaff";
 import ModalAttackendPerson from "../../components/modals/modalAttackendPerson";
@@ -24,24 +24,16 @@ const Registration = () => {
     const dispacth = useDispatch();
     const attackendPersonCurrent = useSelector(state => state.attackendPerson?.currentAttackendPersons);
     const agrressorPersonCurrent = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
-
-    console.log(attackendPersonCurrent);
+    
     const { handleSubmit, register, control, formState: { errors } } = useForm({});
     const [modalAttackend, setmodalAttackend] = useState(false);
     const [typeQuerie, settypeQuerie] = useState(0);
     const [available, setAvailable] = useState(false);
+    // setAvailable(true);
     const [modalAggressor, setmodalAggressor] = useState(false);
     const [modalAggressorStaff, setmodalAggressorStaff] = useState(false);
     const [selectAgrressor, setSelectAgrressor] = useState(0);
-    const [attackedPerson, setAttackedPerson] = useState([
-        // {
-        //     id: "1",
-        //     name: "Edwin Enrique",
-        //     lastname: "Torres Rojas",
-        //     level: "Seundaria",
-        //     grade: "Cuarto"
-        // }
-    ]);
+
     const [subTiposIncidencias, setSubTiposIncidencias] = useState([
         {
             "insu_id": "1",
@@ -126,19 +118,18 @@ const Registration = () => {
             "&ai_insu_id=" + data.selectSubTipo + "&ai_inmo_id=" + data.selectMotivo + "&ac_inci_lugar=" + data.selectLugar +
             "&av_inci_evidencia=" + "NuevaEvidencia" +
             "&av_inci_detalle=" + data.detalle + "&ai_inci_usuario_registro=" + 1;
-        await axios("http://localhost:8080/wsCodeigniterCPB/wsRegistraIncidencia.php?" + params + "", {
+        await axios("http://localhost:80/wsCodeigniterCPB/wsRegistraIncidencia.php?" + params + "", {
             mode: "cors",
             method: 'POST',
             headers: {
                 "Accept": "application/json;charset=utf-8"
             },
         }).then(async (res) => {
-            console.log(res);
             agrressorPersonCurrent.forEach(async (agrressor) => {
                 const params = "ai_inci_id=" + res.data[0]?.inci_id + "&ai_peie_id=" + agrressor?.peie_id + "&ai_alum_id=" +
                     (agrressor?.alum_id || "") + "&ai_inag_usuario_registro=" + 1;
 
-                await axios("http://localhost:8080/wsCodeigniterCPB/wsRegistraIncidenciaAgresor.php?" + params + "", {
+                await axios("http://localhost:80/wsCodeigniterCPB/wsRegistraIncidenciaAgresor.php?" + params + "", {
                     mode: "cors",
                     method: 'POST',
                     headers: {
@@ -146,6 +137,7 @@ const Registration = () => {
                     }
                 }).then((res) => {
                     console.log(res);
+                    dispacth(setAllCpbBitacoraAttackendPersons(res.data));
                 }).catch((err) => {
                     console.log(err);
                 });
@@ -225,6 +217,7 @@ const Registration = () => {
                                             lastname={person?.alum_apellidos}
                                             level={person?.alum_nivel}
                                             grade={person?.alum_grado}
+                                            setAvailable={setAvailable}
                                         />
                                     ))}
                                 </ol>
