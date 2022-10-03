@@ -3,7 +3,7 @@ import {FaTrashAlt} from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentAttackendPersons } from '../../../app/features/attackendPerson/attackendPerson';
 
-const AttackendPersonRow = ({id, name, lastname, level, grade}) => {
+const AttackendPersonRow = ({id, name, lastname,turno, level, grade,section,setAvailable, details = false}) => {
 
     const dispacth = useDispatch();
     const attackendPersonCurrent = useSelector(state => state.attackendPerson?.currentAttackendPersons);
@@ -12,11 +12,13 @@ const AttackendPersonRow = ({id, name, lastname, level, grade}) => {
 
     const handleDeleteAttackend = () => {
         dispacth(setCurrentAttackendPersons(newAttackendPersonCurrent))
+        setAvailable(false);
     }
     return (
         <li className="item-direction item-container-direction .item-container-row" >
             <div style={{ cursor: "pointer" }} className="attribute-direction" data-name="Nombres">{name}</div>
             <div className="attribute-direction " data-name="Apellidos">{lastname}</div>
+            <div className="attribute-direction" data-name="Turno">{turno}</div>
             <div className="attribute-direction" data-name="Nivel">{level}</div>
             <div className="attribute-direction" data-name="Grado">
                 {/* {state == "A" ? (
@@ -25,13 +27,16 @@ const AttackendPersonRow = ({id, name, lastname, level, grade}) => {
                     <Inactive>{"Inactivo"}</Inactive>
                 )} */ grade} 
             </div>
-            <div className="attribute-direction" data-name="Acciones">
-                {/* <More>
-                    <FaEye onClick={handleDetailDirection} />
-                    <FaEdit onClick={handleEditDirection} />
-                </More> */}
-                <FaTrashAlt role="button" onClick={handleDeleteAttackend}/>
-            </div>
+            <div className="attribute-direction" data-name="Sección">{section}</div>
+            {!details && (
+                <div className="attribute-direction" data-name="Acciones">
+                    {/* <More>
+                        <FaEye onClick={handleDetailDirection} />
+                        <FaEdit onClick={handleEditDirection} />
+                    </More> */}
+                            <FaTrashAlt role="button" onClick={handleDeleteAttackend}/>
+                </div>
+            )}
         </li>
     )
 };

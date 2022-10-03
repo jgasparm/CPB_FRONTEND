@@ -1,5 +1,6 @@
 import { SET_ALL_QUERYINCIDENCE } from "./queriesIncidence";
 import { SET_CURRENT_QUERYINCIDENCE} from "./queriesIncidence";
+import { SET_CURRENT_ALUMNOQUERYINCIDENCE} from "./queriesIncidence";
 
 const initialState = {
 };
@@ -10,6 +11,8 @@ const queryIncidenceReducer = (state = initialState, action) => {
       return { ...state, allQueryIncidences: action.payload };
     case SET_CURRENT_QUERYINCIDENCE:
       return { ...state, currentQueryIncidences: action.payload};
+    case SET_CURRENT_ALUMNOQUERYINCIDENCE:
+      return { ...state, currentAlumnoQueryIncidences: action.payload};
     default:
       return state;
   }

@@ -1,8 +1,10 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAllAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
+import { allGradesApi, allLevelsApi, allSectionsApi, allTurnsApi } from '../../../api';
+import { setAllAgrressorPersons, setCurrentAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
+import { setAllIncidencesBitacoraAttackendPersons } from '../../../app/features/attackendPerson/attackendPerson';
 import SearchAgrressorRow from '../../Tables/searchAggressorRow';
 import {
     DivContent, ContainerModal, SectionSearch, Formulario,
@@ -10,65 +12,113 @@ import {
     ContentInput, InputText, FooterButton
 } from '../modals';
 
-const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
+const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor,typeBitacora, setAvailable = false}) => {
 
-    const [aggressorPerson, setAggressorPersonPerson] = useState([
-        // {
-        //     id: "1",
-        //     name: "José Diego",
-        //     lastname: "Zavala Alfaro",
-        //     level: "Seundaria",
-        //     grade: "Cuarto"
-        // }, {
-        //     id: "2",
-        //     name: "Luis Franco",
-        //     lastname: "Durán Silva",
-        //     level: "Seundaria",
-        //     grade: "Quinto"
-        // },
-    ]);
+    const dispatch = useDispatch();
+    const [sendAggressorPerson, setSendAggressorPersonPerson] = useState([]);
+    const [isEmptyItems, setIsEmptyITems] = useState(false);
+
+    const regex = new RegExp("^[ñíóáéú a-zA-Z ]+$");
+
     const agrressorPerson = useSelector(state => state.agrressorPerson?.allAgrressorPersons);
-    const dispacth = useDispatch();
+    const idAgrressorPerson = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
     const { handleSubmit, register, control, formState: { errors } } = useForm({
         mode: 'onChange',
     });
-    const allturns = [
-        { codeTurn: "1", typeTurn: "mañana" },
-        { codeTurn: "2", typeTurn: "tarde" },
-    ];
-    const allLevels = [
-        { codeLevel: "1", typeLevel: "Primaria" },
-        { codeLevel: "2", typeLevel: "Secundaria" },
-    ]
-    const allGrades = [
-        { codeGrade: "1", typeGrade: "1er grado" },
-        { codeGrade: "2", typeGrade: "2er grado" },
-        { codeGrade: "3", typeGrade: "3er grado" },
-        { codeGrade: "4", typeGrade: "4er grado" },
-        { codeGrade: "5", typeGrade: "5er grado" },
-    ]
-    const allSections = [
-        { codeSection: "1", typeSection: "A" },
-        { codeSection: "2", typeSection: "B" },
-        { codeSection: "3", typeSection: "C" },
-        { codeSection: "4", typeSection: "D" },
-    ]
+
+    const [allturns, setAllTurns] = useState(null);
+    const [allLevels, setAllLevels] = useState(null);
+    const [allGrades, setAllGrades ] = useState(null);
+    const [allSections, setAllSections] = useState(null) ;
+
+    useEffect( () => {
+        let promise1 = allTurnsApi();
+        promise1.then((res) => {
+            setAllTurns(res);
+        });
+        let promise2 = allLevelsApi();
+        promise2.then((res) => {
+            setAllLevels(res);
+        });
+        let promise3 = allGradesApi();
+        promise3.then((res) => {
+            setAllGrades(res);
+        });
+        let promise4 = allSectionsApi();
+        promise4.then((res) => {
+            setAllSections(res);
+        });
+
+    },[]);
+        // console.log(res)
+        // console.log(allturns);
+
     const onSubmit = async (data) => {
         const params = "ac_alum_turno=" + data.selectTurn + "&ac_alum_nivel=" + data.selectLevel + "&ac_alum_grado=" + data.selectGrade +
             "&ac_alum_seccion=" + data.selectSection + "&av_alum_apellidos=" +
             data.apellidos + "&av_alum_nombres=" + data.nombres;
 
-        await axios("http://localhost:80/wsCodeigniterCPB/wsConsultaBuscarAlumno.php?" + params + "", {
+        await axios("http://localhost:8080/wsCodeigniterCPB/wsConsultaBuscarAlumno.php?" + params + "", {
             mode: "cors",
             method: 'GET',
             headers: {
                 "Accept": "application/json;charset=utf-8",
             },
         }).then((res) => {
-            dispacth(setAllAgrressorPersons(res.data));            
+            if(res.data.length < 1){
+                setIsEmptyITems(true)
+            }else{
+                setIsEmptyITems(false)
+            }
+            dispatch(setAllAgrressorPersons(res.data));
         });
 
     };
+    const handleSelectAgrressorPerson = async () => {
+        // BITACORA DE PERSONA AGRAVIADA
+        if(typeBitacora == 1){   
+            if (idAgrressorPerson == null || idAgrressorPerson.length < 1) {
+                dispatch(setCurrentAgrressorPersons([sendAggressorPerson]));
+                setmodalAggressor(false)
+            } else {
+                let validate = true;
+                idAgrressorPerson?.forEach(agrressor => {
+                    if (agrressor?.alum_id == sendAggressorPerson?.alum_id) {
+                        console.log("no se puede registrar 2 veces el mismo personal");
+                        validate = false;
+                    }
+                });
+                if (validate) {
+                    idAgrressorPerson.push(sendAggressorPerson);
+                    dispatch(setCurrentAgrressorPersons(idAgrressorPerson));
+                    setmodalAggressor(false)
+                }
+            }
+        // BITACORA DE PERSONA AGRESORA
+        }else if(typeBitacora == 2){
+            if (idAgrressorPerson == null || idAgrressorPerson.length < 1) {
+                dispatch(setCurrentAgrressorPersons([sendAggressorPerson]));
+                setAvailable(true);
+                await handleIncidencesAttackend(sendAggressorPerson);
+                setmodalAggressor(false)
+            }
+        }   
+    }
+
+    const handleIncidencesAttackend = async (person) => {
+        const params = "av_tipo="+"AL"+"&ai_agresor_id=" + person.alum_id;
+        await axios("http://localhost:8080/wsCodeigniterCPB/wsConsultaAgresorIncidencias.php?" + params + "", {
+            mode: "cors",
+            method: 'GET',
+            headers: {
+                "Accept": "application/json;charset=utf-8",
+            },
+        }).then((res) => {
+            dispatch(setAllIncidencesBitacoraAttackendPersons(res.data));
+        });
+
+    } 
+
     return (
         <>
             {modalAggressor && (
@@ -87,10 +137,10 @@ const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
                                         })}
                                         control={control}
                                     >
-                                        <option value="">--seleccione--</option>
+                                        <option value="0">Todos</option>
                                         {allturns?.map((turn, index) => (
-                                            <option key={index} value={turn?.codeTurn} >
-                                                {`${turn?.typeTurn}`}
+                                            <option key={index} value={turn?.pade_cadena} >
+                                                {`${turn?.pade_descripcion}`}
                                             </option>
                                         ))}
                                     </SelectOption>
@@ -103,10 +153,10 @@ const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
                                         })}
                                         control={control}
                                     >
-                                        <option value="">--seleccione--</option>
+                                        <option value="0">Todos</option>
                                         {allLevels?.map((level, index) => (
-                                            <option key={index} value={level?.codeLevel}>
-                                                {`${level?.typeLevel}`}
+                                            <option key={index} value={level?.pade_cadena}>
+                                                {`${level?.pade_descripcion}`}
                                             </option>
                                         ))}
                                     </SelectOption>
@@ -122,10 +172,10 @@ const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
                                         control={control}
                                         defaultValue={""}
                                     >
-                                        <option value="">--seleccione--</option>
+                                        <option value="0">Todos</option>
                                         {allGrades?.map((Grade, index) => (
-                                            <option key={index} value={Grade?.codeGrade}>
-                                                {`${Grade?.typeGrade}`}
+                                            <option key={index} value={Grade?.pade_cadena}>
+                                                {`${Grade?.pade_descripcion}`}
                                             </option>
                                         ))}
                                     </SelectOption>
@@ -135,13 +185,12 @@ const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
                                     <SelectOption
                                         id="optionSection"
                                         {...register("selectSection", {
-                                            // required:{ value: true, message:"Campo obligatorio"}
                                         })}
                                     >
-                                        <option value="">--seleccione--</option>
+                                        <option value="0">Todos</option>
                                         {allSections?.map((Section, index) => (
-                                            <option key={index} value={Section?.codeSection}>
-                                                {`${Section?.typeSection}`}
+                                            <option key={index} value={Section?.pade_cadena}>
+                                                {`${Section?.pade_descripcion}`}
                                             </option>
                                         ))}
                                     </SelectOption>
@@ -150,17 +199,31 @@ const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
                             <ContentInput>
                                 <ContentBox>
                                     <TextField>Apellidos</TextField>
-                                    <InputText disabled={false} placeholder='apellidos'
-                                        {...register("apellidos")}
+                                    <InputText type="text" placeholder='apellidos' maxLength="100"
+                                        id="apellidos"
+                                        {...register("apellidos", {
+                                            // required: "required",
+                                            pattern:{
+                                                value: regex
+                                            }
+                                        })}
                                         control={control}
                                     ></InputText>
+                                    {errors.apellidos && <span className='text-danger' role="alert">Ingrese solo letras</span>}
                                 </ContentBox>
                                 <ContentBox>
                                     <TextField>Nombres</TextField>
-                                    <InputText disabled={false} placeholder='nombres'
-                                        {...register("nombres")}
+                                    <InputText disabled={false} placeholder='nombres' maxLength="100"
+                                        id="nombres"
+                                        {...register("nombres", {
+                                            // required: "required",
+                                            pattern:{
+                                                value: regex
+                                            }
+                                        })}
                                         control={control}
                                     ></InputText>
+                                    {errors.nombres && <span className='text-danger' role="alert">Ingrese solo letras</span>}
                                 </ContentBox>
                             </ContentInput>
                             <div className='mt-2 d-flex justify-content-end'>
@@ -179,22 +242,28 @@ const ModalAggressorPerson = ({ modalAggressor, setmodalAggressor }) => {
                                     <div className="attribute-title-direction">Apellidos</div>
                                     <div className="attribute-title-direction">Nivel</div>
                                     <div className="attribute-title-direction">Grado</div>
-                                    <div className="attribute-title-direction">Acciones</div>
+                                    {/* <div className="attribute-title-direction">Acciones</div> */}
                                 </li>
-                                {agrressorPerson?.map((person, index) => (
-                                    <SearchAgrressorRow
-                                        key={index}
-                                        id={person?.alum_id}
-                                        name={person?.alum_nombres}
-                                        lastname={person?.alum_apellidos}
-                                        level={person?.alum_nivel}
-                                        grade={person?.alum_grado}
-                                    />
-                                ))}
+                                {agrressorPerson != null && (
+                                    agrressorPerson?.map((person, index) => (
+                                        <SearchAgrressorRow
+                                            key={index}
+                                            id={person?.alum_id}
+                                            name={person?.alum_nombres}
+                                            lastname={person?.alum_apellidos}
+                                            level={person?.nivel_descripcion}
+                                            grade={person?.grado_descripcion}
+                                            setSendAggressorPersonPerson={setSendAggressorPersonPerson}
+                                        />
+                                    ))
+                                )}
+                                {isEmptyItems && <p className="text-center m-1">No se encontraron coincidencias</p>}
                             </ol>
                         </div>
                         <FooterButton>
-                            <button className='btn btn-sm btn-primary bg-gradient'>Agregar presunto agresor</button>
+                            <button type='button' className='btn btn-sm btn-primary bg-gradient'
+                                onClick={handleSelectAgrressorPerson}
+                            >Agregar presunto agresor</button>
                         </FooterButton>
                     </Formulario>
                 </DivContent>

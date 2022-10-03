@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
 
-const SearchAggressorStaffRow = ({id, name, lastname, position }) => {
+const SearchAggressorStaffRow = ({id, name, lastname, position, setSendAggressorPersonPerson }) => {
 
     const dispacth = useDispatch();
     const idAgrressorPerson = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
@@ -10,13 +10,14 @@ const SearchAggressorStaffRow = ({id, name, lastname, position }) => {
         )?.find((person) => person?.peie_id === id);
     
     const handleResaltSelected = () => {
+        setSendAggressorPersonPerson(agrressorPerson)
         // dispacth(setCurrentAgrressorPersons([agrressorPerson]));
-        if (idAgrressorPerson == null || idAgrressorPerson.length < 1) {
-            dispacth(setCurrentAgrressorPersons([agrressorPerson]));
-        }else{
-            idAgrressorPerson.push(agrressorPerson);
-            dispacth(setCurrentAgrressorPersons(idAgrressorPerson));
-        }
+        // if (idAgrressorPerson == null || idAgrressorPerson.length < 1) {
+        //     dispacth(setCurrentAgrressorPersons([agrressorPerson]));
+        // }else{
+        //     idAgrressorPerson.push(agrressorPerson);
+        //     dispacth(setCurrentAgrressorPersons(idAgrressorPerson));
+        // }
         // else if (idAgrressorPerson.length < 3){
         //     idAgrressorPerson.push(agrressorPerson);
         //     dispacth(setCurrentAgrressorPersons(idAgrressorPerson));
@@ -32,14 +33,7 @@ const SearchAggressorStaffRow = ({id, name, lastname, position }) => {
         >
             <div style={{ cursor: "pointer" }} className="attribute-direction" data-name="Nombres">{name}</div>
             <div className="attribute-direction " data-name="Apellidos">{lastname}</div>
-            <div className="attribute-direction" data-name="Puesto">{position}</div>
-            <div className="attribute-direction" data-name="Acciones">
-                {/* <More>
-                    <FaEye onClick={handleDetailDirection} />
-                    <FaEdit onClick={handleEditDirection} />
-                </More> */}
-                nada
-            </div>
+            <div className="attribute-direction" data-name="Tipo de Personal">{position}</div>
         </li>
     )
 }

@@ -2,21 +2,15 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { setCurrentAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
 
-const SearchAgrressorRow = ({id, name, lastname, level, grade}) => {
-    const dispacth = useDispatch();
-
+const SearchAgrressorRow = ({id, name, lastname, level, grade, setSendAggressorPersonPerson}) => {
+    const dispatch = useDispatch();
     const idAgrressorPerson = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
     const agrressorPerson = useSelector(state => state.agrressorPerson?.allAgrressorPersons
         )?.find((person) => person?.alum_id === id);
 
     const handleResaltSelected = () => {
-        // dispacth(setCurrentAgrressorPersons(null));
-        if (idAgrressorPerson == null || idAgrressorPerson.length < 1) {
-            dispacth(setCurrentAgrressorPersons([agrressorPerson]));
-        }else{
-            idAgrressorPerson.push(agrressorPerson);
-            dispacth(setCurrentAgrressorPersons(idAgrressorPerson));
-        }
+        setSendAggressorPersonPerson(agrressorPerson);
+
     }
     return (
         <li className="item-direction item-container-direction .item-container-row"
@@ -33,13 +27,13 @@ const SearchAgrressorRow = ({id, name, lastname, level, grade}) => {
                     <Inactive>{"Inactivo"}</Inactive>
                 )} */ grade} 
             </div>
-            <div className="attribute-direction" data-name="Acciones">
-                {/* <More>
+            {/* <div className="attribute-direction" data-name="Acciones">
+                <More>
                     <FaEye onClick={handleDetailDirection} />
                     <FaEdit onClick={handleEditDirection} />
-                </More> */}
+                </More>
                 nada
-            </div>
+            </div> */}
         </li>
     )
 }

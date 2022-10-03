@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { setCurrentAttackendPersons, setCurrentBitacoraAttackendPersons } from '../../../app/features/attackendPerson/attackendPerson';
 
-const SearchAttackendRow = ({id, name, lastname, level, grade, typeQuerie, setSendAttackendCurrent}) => {
+const SearchAttackendRow = ({id, name, lastname,turno, level, grade,section, typeQuerie, setSendAttackendCurrent}) => {
     const dispacth = useDispatch();
 
     const idAttackendPerson = useSelector(state => state.attackendPerson?.currentAttackendPersons);
@@ -12,12 +12,9 @@ const SearchAttackendRow = ({id, name, lastname, level, grade, typeQuerie, setSe
 
     const handleResaltSelected = async () => {
         if(typeQuerie == 1){
-            dispacth(setCurrentAttackendPersons([attackendPerson]));
-            console.log("adadada");
+            setSendAttackendCurrent(attackendPerson)
         }else if (typeQuerie == 2) {
             setSendAttackendCurrent(attackendPerson)
-            //dispacth(setCurrentBitacoraAttackendPersons([attackendPerson]));
-            console.log("adadada");
         }
     }
     return (
@@ -27,6 +24,7 @@ const SearchAttackendRow = ({id, name, lastname, level, grade, typeQuerie, setSe
         >
             <div style={{ cursor: "pointer" }} className="attribute-direction" data-name="Nombres">{name}</div>
             <div className="attribute-direction " data-name="Apellidos">{lastname}</div>
+            <div className="attribute-direction" data-name="Nivel">{turno}</div>
             <div className="attribute-direction" data-name="Nivel">{level}</div>
             <div className="attribute-direction" data-name="Grado">
                 {/* {state == "A" ? (
@@ -35,13 +33,13 @@ const SearchAttackendRow = ({id, name, lastname, level, grade, typeQuerie, setSe
                     <Inactive>{"Inactivo"}</Inactive>
                 )} */ grade} 
             </div>
-            <div className="attribute-direction" data-name="Acciones">
-                {/* <More>
+            <div className="attribute-direction" data-name="Nivel">{section}</div>
+            {/* <div className="attribute-direction" data-name="Acciones">
+                 <More>
                     <FaEye onClick={handleDetailDirection} />
                     <FaEdit onClick={handleEditDirection} />
-                </More> */}
-                nada
-            </div>
+                </More>
+            </div> */}
         </li>
     )
 }

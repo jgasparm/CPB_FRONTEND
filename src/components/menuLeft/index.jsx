@@ -1,7 +1,49 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { setAllAgrressorPersons, setCurrentAgrressorPersons } from '../../app/features/aggressorPerson/agrressorPerson';
+import { setAllAttackendPersons, setAllCpbBitacoraAttackendPersons, setAllIncidencesBitacoraAttackendPersons, setCurrentAttackendPersons, setCurrentBitacoraAttackendPersons } from '../../app/features/attackendPerson/attackendPerson';
+import { setAllQueryPotentialBullying } from '../../app/features/queriesPotentialBullying/queriesPotentialBullying';
+import { setAllQueryIncidences } from '../../app/features/queryIncidence/queriesIncidence';
 
 const Menu = () => {
+
+    const dispatch = useDispatch();
+
+    const handleClearDatasBitacora = async ()  => {
+        dispatch(setAllAgrressorPersons(null));
+        dispatch(setAllAttackendPersons(null));
+        dispatch(setCurrentBitacoraAttackendPersons(null));
+        dispatch(setCurrentAttackendPersons(null));
+        dispatch(setAllIncidencesBitacoraAttackendPersons(null));        
+        dispatch(setAllCpbBitacoraAttackendPersons(null));
+        dispatch(setCurrentAgrressorPersons(null));
+    }
+
+    const handleClearDatasBitacoraAggressor = () => {
+        dispatch(setCurrentAgrressorPersons(null));
+        dispatch(setAllIncidencesBitacoraAttackendPersons(null))
+        dispatch(setAllAgrressorPersons(null));
+        console.log("DALETE DATA");
+    }
+
+    const handleClearIncidences = () => {
+        dispatch(setAllQueryIncidences(null));
+        dispatch(setAllAgrressorPersons(null));
+        dispatch(setAllIncidencesBitacoraAttackendPersons(null))
+    }
+    const handleClearPotentialBullying = () => {
+        dispatch(setAllQueryPotentialBullying(null));
+        dispatch(setAllIncidencesBitacoraAttackendPersons(null))
+        dispatch(setCurrentAgrressorPersons(null));
+    }
+    const handleClearDataRegistroIncidencia = () => {
+        dispatch(setAllAgrressorPersons(null));
+        dispatch(setAllAgrressorPersons(null));
+        dispatch(setCurrentAgrressorPersons(null));
+        dispatch(setAllIncidencesBitacoraAttackendPersons(null))
+        console.log("DALETE DATA");
+    }
 
     return (
         <aside className='menu-left'>
@@ -14,41 +56,33 @@ const Menu = () => {
                         <Link to="/variables">Mantenimiento</Link>
                     </li>
                     <li className='menu-left-link'>
-                        <Link to="/registro">Registro de Incidencias</Link>
+                        <Link to="/registro" onClick={handleClearDataRegistroIncidencia}>Registro de Incidencias</Link>
                     </li>
-
-                    {/* <div className="accordion" id="accordionExample">
+                    <li className="menu-left-link accordion accordion-flush" id="accordionFlushExample">
                         <div className="accordion-item">
-                            <h2 className="accordion-header" id="headingOne">
-                                <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Accordion Item #1
+                            <h2 className="accordion-header" id="flush-headingOne">
+                                <button className="accordion-button collapsed text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                    Consultas
                                 </button>
                             </h2>
-                            <div id="collapseOne" className="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div id="flush-collapseOne" className="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                 <div className="accordion-body">
-                                    <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classNamees that we use to style each element. These classNamees control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                    <div className="accordion-link">
+                                        <Link to="/consultas-bitacora" onClick={handleClearDatasBitacora}>Bitacora Agredido</Link>
+                                    </div>
+                                    <div className="accordion-link">
+                                        <Link to="/consultas-bitacora-aggressor" onClick={handleClearDatasBitacoraAggressor}>Bitacora Agresor</Link>
+                                    </div>
+                                    <div className="accordion-link">
+                                        <Link to="/consultas" onClick={handleClearIncidences} >Incidencias</Link>
+                                    </div>
+                                    <div className="accordion-link">
+                                        <Link to="/consultas-casos-bullying" onClick={handleClearPotentialBullying}>Casos Bullying</Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div> */}
-
-                    <div className="accordion" id="accordionSubMenu">
-                       <div className="">
-                         <li role="button" className='menu-left-link accordion-header' id='headerOne'>
-                             <span className="" role="button" data-bs-toggle="collapse" data-bs-target="#consultaOne" aria-expanded="true" aria-controls="collapseOne">
-                                 Consultas
-                             </span>
-                         </li>
-                         <div id='consultaOne' className='accordion-collapse collapse' aria-labelledby="headerOne" data-bs-parent="#accordionSubMenu">
-                             <div className="accordion-link">
-                                 <Link to="/consultas-bitacora">Bitacora</Link>
-                             </div>
-                             <div className="accordion-link">
-                                 <Link to="/consultas">Incidencias</Link>
-                             </div>
-                         </div>
-                       </div>
-                    </div>
+                    </li>
                     <div><hr /></div>
                 </ul>
             </div>

@@ -1,4 +1,4 @@
-ol.collection-direction {
+ol.collection-incidents {
 	margin-top: 25px;
 	margin-left: 35px;
 	margin-right: 35px;
@@ -13,20 +13,20 @@ li {
 .barra{
     text-align: -webkit-right;
 }
-.attribute-direction:nth-child(2),
-.attribute-direction:nth-child(4){
+.attribute-incidents:nth-child(2),
+.attribute-incidents:nth-child(4){
     border-left: 2px solid rgb(220, 220, 220) !important;
     border-right: 2px solid rgb(220, 220, 220) !important;
 }
 /* 2 Column Card Layout */
 @media screen and (max-width: 736px) {
-    .collection-container-direction {
+    .collection-container-incidents {
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-gap: 20px;
     }
 
-    .item-direction {
+    .item-incidents {
         border: 0px solid;
         border-radius: 2px;
         padding: 10px;
@@ -34,17 +34,17 @@ li {
     }
 
     /* Don't display the first item, since it is used to display the header for tabular layouts*/
-    .collection-container-direction>li:first-child {
+    .collection-container-incidents>li:first-child {
         display: none;
     }
 
-    .attribute-direction::before {
+    .attribute-incidents::before {
         content: attr(data-name);
         color: #31c3c3;
     }
 
     /* Attribute name for first column, and attribute value for second column. */
-    .attribute-direction {
+    .attribute-incidents {
         display: grid;
         grid-template-columns: minmax(6em, 30%) 1fr;
         margin-top: 20px;
@@ -55,7 +55,7 @@ li {
         line-height: 20px;
     }
 
-    .attribute-title-direction {
+    .attribute-title-incidents {
         display: grid;
         grid-template-columns: minmax(6em, 30%) 1fr;
         margin-top: 20px;
@@ -65,7 +65,7 @@ li {
         font-weight: 600;
     }
 
-    ol.collection-direction {
+    ol.collection-incidents {
         margin-top: 25px;
         margin-left: 15px;
         margin-right: 15px;
@@ -80,12 +80,12 @@ li {
 
 /* 1 Column Card Layout */
 @media screen and (max-width:580px) {
-    .collection-container-direction {
+    .collection-container-incidents {
         display: grid;
         grid-template-columns: 1fr;
     }
 
-    ol.collection-direction {
+    ol.collection-incidents {
         margin-top: 25px;
         margin-left: 15px;
         margin-right: 15px;
@@ -95,24 +95,24 @@ li {
 /* Tabular Layout */
 @media screen and (min-width: 737px) {
     /* The maximum column width, that can wrap */
-    .item-container-direction {
+    .item-container-incidents {
         display: grid;
-        grid-template-columns: 1fr 1fr 0.5fr 0.4fr 0.4fr 0.4fr 0.5fr
+        grid-template-columns: 0.7fr .7fr 0.4fr 0.3fr 0.5fr 0.5fr .2fr
     }
 
-    .attribute-container-direction {
+    .attribute-container-incidents {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(var(--column-width-min), 1fr));
     }
 
     /* Definition of wrapping column width for attribute groups. */
 
-    .collection-direction {
+    .collection-incidents {
         border-top: 0px solid;
     }
 
     /* In order to maximize row lines, only display one line for a cell */
-    .attribute-direction {
+    .attribute-incidents {
         padding: 2px;
         overflow: hidden;
         white-space: nowrap;
@@ -126,7 +126,7 @@ li {
         line-height: 20px;
     }
 
-    .attribute-title-direction {
+    .attribute-title-incidents {
         padding: 2px;
         overflow: hidden;
         white-space: nowrap;
@@ -139,16 +139,16 @@ li {
         margin-block-end: 8px;
     }
 
-    .collection-container-direction>.item-container-direction:first-child {
+    .collection-container-incidents>.item-container-incidents:first-child {
         background-color: #d2d2d262;
     }
 
-    .item-container-direction:hover {
+    .item-container-incidents:hover {
         background-color: rgb(200, 227, 252);
     }
 
     /* Center header labels */
-    .collection-container-direction>.item-container-direction:first-child .attribute-direction {
+    .collection-container-incidents>.item-container-incidents:first-child .attribute-incidents {
         display: flex;
         align-items: center;
         text-overflow: initial;
@@ -156,13 +156,13 @@ li {
         white-space: normal;
     }
 
-    ol.collection-direction {
-        margin-top: 10px;
+    ol.collection-incidents {
+        margin-top: 25px;
         margin-left: 0px;
         margin-right: 0px;
     }
 
-    .item-direction {
+    .item-incidents {
         border-bottom: 1px solid #e5e7eb;
     }
 }

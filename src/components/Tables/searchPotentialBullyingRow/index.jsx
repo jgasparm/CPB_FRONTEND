@@ -2,24 +2,23 @@ import axios from 'axios';
 import React from 'react';
 import {FaEye} from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import { setAllAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
 import { setCurrentAlumnoQueryIncidences, setCurrentQueryIncidences } from '../../../app/features/queryIncidence/queriesIncidence';
 
-const SeacrhInicidentsRow = ({id, name, lastname, level, grade, typeIncident, subTypeIncident, setStatelDetails}) => {
+const SearchPotentialBullyingRow = ({id, name, lastname, date, reason, action, results}) => {
     const dispatch = useDispatch();
-    const incidence = useSelector(state => state.queryIncidence?.allQueryIncidences)?.find(
-        (incidence) => incidence.inci_id === id);
+
+    const incidence = useSelector(state => state.queryPotentialBullying?.allQueryPotentialBullying)?.find(
+        (incidence) => incidence.alum_id === id);
 
     const handleDetailincidents = async () => {
         // dispatch(id);
-        dispatch(setCurrentQueryIncidences(incidence));
-        await handleSearchAlumno(incidence);
-        // MOSTRAR MODAL DETALLES DE INCIDENCIAS
-        setStatelDetails(true);
+        // dispatch(setCurrentQueryIncidences([incidence]));
+        // await handleSearchAlumno(incidence);
     }
+    // FUNCION QUE ME TRAE 
     const handleSearchAlumno = async (data) => {
         const params = "ac_alum_turno=" + "0" + "&ac_alum_nivel=" + "0" + "&ac_alum_grado=" + "0" +
-            "&ac_alum_seccion=" + "0" + "&av_alum_apellidos=" + "" + "&av_alum_nombres=" + "";
+            "&ac_alum_seccion=" + "0" + "&av_alum_apellidos=" + "0" + "&av_alum_nombres=" + "0";
 
         await axios("http://localhost:8080/wsCodeigniterCPB/wsConsultaBuscarAlumno.php?" + params + "", {
             mode: "cors",
@@ -35,15 +34,6 @@ const SeacrhInicidentsRow = ({id, name, lastname, level, grade, typeIncident, su
                 }
             });
         });
-        await axios("http://localhost:8080/wsCodeigniterCPB/wsConsultaIncidenciaAgresor.php?ai_inci_id="+data.inci_id,{
-            mode: "cors",
-            method: 'GET',
-            headers: {
-                "Accept": "application/json;charset=utf-8",
-            }, 
-        }).then((res) => {
-            dispatch(setAllAgrressorPersons(res.data));
-        })
 
     };
 
@@ -51,15 +41,15 @@ const SeacrhInicidentsRow = ({id, name, lastname, level, grade, typeIncident, su
         <li className="item-incidents item-container-incidents .item-container-row" >
             <div style={{ cursor: "pointer" }} className="attribute-incidents" data-name="Nombres">{name}</div>
             <div className="attribute-incidents " data-name="Apellidos">{lastname}</div>
-            <div className="attribute-incidents" data-name="Nivel">{level}</div>
-            <div className="attribute-incidents" data-name="Grado">{grade}</div>
-            <div className="attribute-incidents" data-name="Tipo de incidencia">{typeIncident}</div>
-            <div className="attribute-incidents" data-name="Subtipo de incidencia">
+            <div className="attribute-incidents" data-name="Fecha y Hora">{date}</div>
+            <div className="attribute-incidents" data-name="Motivo">{reason}</div>
+            <div className="attribute-incidents" data-name="Acción realizada">{action}</div>
+            <div className="attribute-incidents" data-name="Resultados Esperados">
                 {/* {state == "A" ? (
                     <Active>{"Activo"}</Active>
                 ) : (
                     <Inactive>{"Inactivo"}</Inactive>
-                )} */ subTypeIncident} 
+                )} */ results} 
             </div>
             <div className="attribute-incidents" data-name="Acciones">
                 {/* <More>
@@ -72,4 +62,4 @@ const SeacrhInicidentsRow = ({id, name, lastname, level, grade, typeIncident, su
     )
 }
 
-export default SeacrhInicidentsRow;
+export default SearchPotentialBullyingRow;

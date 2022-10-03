@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentAgrressorPersons } from '../../../app/features/aggressorPerson/agrressorPerson';
 import { setAllIncidencesBitacoraAttackendPersons } from '../../../app/features/attackendPerson/attackendPerson';
 
-const AggressorPersonRow = ({id, name, lastname, level, grade, setAvailable, bitacoraAggressor = false, details = false}) => {
+const AggressorPersonStaffRow = ({id, name, lastname, tipoPersonal, setAvailable, bitacoraAggressor = false, details = false}) => {
 
     const dispacth = useDispatch();
     const agrressorPersonCurrent = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
-    console.log(agrressorPersonCurrent);
+    // console.log(agrressorPersonCurrent);
     const newAgrressorPersonCurrent = agrressorPersonCurrent?.filter((person) => {
         if (person?.peie_id &&  person?.peie_id !== id) {
             return person
@@ -17,26 +17,25 @@ const AggressorPersonRow = ({id, name, lastname, level, grade, setAvailable, bit
         }
         // return  person?.peie_id != id || person?.alum_id != id 
     });
-    const handleDeleteAgrressor =  () => {
+    const handleDeleteAgrressor = () => {
         console.log(newAgrressorPersonCurrent);
         dispacth(setCurrentAgrressorPersons(newAgrressorPersonCurrent))
         if(bitacoraAggressor){
             setAvailable(false);
             dispacth(setAllIncidencesBitacoraAttackendPersons(null));
         }
-    } 
+    }
 
     return (
         <li className="item-direction item-container-direction" >
             <div style={{ cursor: "pointer" }} className="attribute-direction" data-name="Nombres">{name}</div>
             <div className="attribute-direction" data-name="Apellidos">{lastname}</div>
-            <div className="attribute-direction" data-name="Nivel">{level}</div>
-            <div className="attribute-direction" data-name="Grado">
+            <div className="attribute-direction" data-name="Puesto">
                 {/* {state == "A" ? (
                     <Active>{"Activo"}</Active>
                 ) : (
                     <Inactive>{"Inactivo"}</Inactive>
-                )} */ grade} 
+                )} */ tipoPersonal} 
             </div>
             {!details && (
                 <div className="attribute-direction" data-name="">
@@ -51,4 +50,4 @@ const AggressorPersonRow = ({id, name, lastname, level, grade, setAvailable, bit
     )
 };
 
-export default AggressorPersonRow;
+export default AggressorPersonStaffRow;

@@ -1,13 +1,16 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import { allPlacesApi, allTypesIncidencesApi } from "../../api";
 import { setAllAgrressorPersons, setCurrentAgrressorPersons } from "../../app/features/aggressorPerson/agrressorPerson";
-import { setAllAttackendPersons } from "../../app/features/attackendPerson/attackendPerson";
+import { setAllAttackendPersons, setAllCpbBitacoraAttackendPersons } from "../../app/features/attackendPerson/attackendPerson";
 import ModalAggressorPerson from "../../components/modals/modalAggressorPerson";
 import ModalAggressorStaff from "../../components/modals/modalAggressorStaff";
 import ModalAttackendPerson from "../../components/modals/modalAttackendPerson";
 import AggressorPersonRow from "../../components/Tables/aggressorPersonRow";
+import AggressorPersonStaffRow from "../../components/Tables/aggressorPersonStaffRow";
 import AttackendPersonRow from "../../components/Tables/attackendPersonRow";
 import {
     Container,
@@ -21,27 +24,24 @@ import {
 } from "./style";
 import "./tableRegistration.scss";
 const Registration = () => {
-    const dispacth = useDispatch();
+    const dispatch = useDispatch();
     const attackendPersonCurrent = useSelector(state => state.attackendPerson?.currentAttackendPersons);
     const agrressorPersonCurrent = useSelector(state => state.agrressorPerson?.currentAgrressorPersons);
-
-    console.log(attackendPersonCurrent);
+    
     const { handleSubmit, register, control, formState: { errors } } = useForm({});
+
+    // ENVIO DE TIPO DE BITACORA AL MODALES DE AGRESORES
+    const bitacoraAggressor= 1;
+
     const [modalAttackend, setmodalAttackend] = useState(false);
     const [typeQuerie, settypeQuerie] = useState(0);
     const [available, setAvailable] = useState(false);
+    // setAvailable(true);
     const [modalAggressor, setmodalAggressor] = useState(false);
     const [modalAggressorStaff, setmodalAggressorStaff] = useState(false);
-    const [selectAgrressor, setSelectAgrressor] = useState(0);
-    const [attackedPerson, setAttackedPerson] = useState([
-        // {
-        //     id: "1",
-        //     name: "Edwin Enrique",
-        //     lastname: "Torres Rojas",
-        //     level: "Seundaria",
-        //     grade: "Cuarto"
-        // }
-    ]);
+    const [selectAgrressor, setSelectAgrressor] = useState(2);
+    const [selectCheck, setSelectCheck] = useState(true);
+
     const [subTiposIncidencias, setSubTiposIncidencias] = useState([
         {
             "insu_id": "1",
@@ -56,20 +56,28 @@ const Registration = () => {
             "insu_descripcion": "Castigo físico"
         }
     ]);
-    const [tiposIncidencias, setTiposIncidencias] = useState([
-        {
-            "pade_cadena": "1",
-            "pade_descripcion": "Física"
-        },
-        {
-            "pade_cadena": "2",
-            "pade_descripcion": "Psicológica"
-        },
-        {
-            "pade_cadena": "3",
-            "pade_descripcion": "Sexual"
-        }
-    ]);
+    const [tiposIncidencias, setTiposIncidencias] = useState(null);
+    const [lugarIncidencia, setLugarIncidencia] = useState();
+
+    // LIMPIAR DATA DE AGRESORES BUSCADOS Y SELECCIONADOS
+    // useEffect( () => {
+    //     dispatch(setAllAgrressorPersons(null));
+    //     dispatch(setCurrentAgrressorPersons(null));
+    // },[]);
+
+    useEffect( () => {
+        let promise1 = allTypesIncidencesApi();
+        promise1.then((res) => {
+            setTiposIncidencias(res);
+        });
+        let promise2 = allPlacesApi();
+        promise2.then((res) => {
+            setLugarIncidencia(res);
+        });
+        // ACA ME QUEDE <========>
+
+    },[]);
+
     const [motivosIncidencia, setMotivosIncidencia] = useState([
         {
             "inmo_id": "1",
@@ -84,48 +92,36 @@ const Registration = () => {
             "inmo_descripcion": "Por su ritmo o estilo de aprendizaje"
         }
     ]);
-    const [lugarIncidencia, setLugarIncidencia] = useState([
-        {
-            "pade_cadena": "1",
-            "pade_descripcion": "Patio principal"
-        },
-        {
-            "pade_cadena": "2",
-            "pade_descripcion": "En el aula"
-        },
-        {
-            "pade_cadena": "2",
-            "pade_descripcion": "En el baño"
-        }
-    ]);
 
     const handleModalAttackend = (e) => {
         e.preventDefault();
-        dispacth(setAllAttackendPersons(null));
+        dispatch(setAllAttackendPersons(null));
         settypeQuerie(1);
         setmodalAttackend(true);
     };
     const handleModalAgrressor = (e) => {
         e.preventDefault();
         if (selectAgrressor == 1) {       
-            dispacth(setAllAgrressorPersons(null));
+            dispatch(setAllAgrressorPersons(null));
             setmodalAggressorStaff(true)
         } else if (selectAgrressor == 2) {
-            dispacth(setAllAttackendPersons(null));
-            dispacth(setAllAgrressorPersons(null));
+            dispatch(setAllAttackendPersons(null));
+            dispatch(setAllAgrressorPersons(null));
             setmodalAggressor(true)
         }
     };
     const handleSelectModal = (payload) => {
         setSelectAgrressor(payload)
-        dispacth(setCurrentAgrressorPersons(null));
+        setSelectCheck(!selectCheck)
+        dispatch(setCurrentAgrressorPersons(null));
     }
     const onSubmit = async (data) => {
         console.log(data);
-        const params = "ac_inci_origen=" + 1 + "&ai_alum_id=" + attackendPersonCurrent[0]?.alum_id + "&ac_inci_tipo=" + data.selectTipo +
+        const params = "ac_inci_origen=" + selectAgrressor + "&ai_alum_id=" + attackendPersonCurrent[0]?.alum_id + "&ac_inci_tipo=" + data.selectTipo +
             "&ai_insu_id=" + data.selectSubTipo + "&ai_inmo_id=" + data.selectMotivo + "&ac_inci_lugar=" + data.selectLugar +
             "&av_inci_evidencia=" + "NuevaEvidencia" +
             "&av_inci_detalle=" + data.detalle + "&ai_inci_usuario_registro=" + 1;
+
         await axios("http://localhost:8080/wsCodeigniterCPB/wsRegistraIncidencia.php?" + params + "", {
             mode: "cors",
             method: 'POST',
@@ -133,7 +129,6 @@ const Registration = () => {
                 "Accept": "application/json;charset=utf-8"
             },
         }).then(async (res) => {
-            console.log(res);
             agrressorPersonCurrent.forEach(async (agrressor) => {
                 const params = "ai_inci_id=" + res.data[0]?.inci_id + "&ai_peie_id=" + agrressor?.peie_id + "&ai_alum_id=" +
                     (agrressor?.alum_id || "") + "&ai_inag_usuario_registro=" + 1;
@@ -146,34 +141,58 @@ const Registration = () => {
                     }
                 }).then((res) => {
                     console.log(res);
+                    dispatch(setAllCpbBitacoraAttackendPersons(res.data));
+                    notify("Se guardó satisfactoriamente la información ingresada");
                 }).catch((err) => {
                     console.log(err);
+                    notifError("Se presentó un error al guardar la información. Comuníquese por favor con el administrador de la plataforma");
                 });
             });
         }).catch((err) => {
             console.log(err);
+            notifError("Se presentó un error al guardar la información. Comuníquese por favor con el administrador de la plataforma");
         });
     }
-
+    const notify = (text) =>
+        toast.success(text, {
+            position: "top-right",
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    const notifError = (text) =>
+        toast.error(text, {
+            position: "top-right",
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
     return (
-        <>
+        <>  
+            <ToastContainer/>
             <ModalAttackendPerson
                 modalAttackend={modalAttackend}
                 setmodalAttackend={setmodalAttackend}
                 typeQuerie={typeQuerie}
-                setAvailable={setAvailable}
+                setAvailable={setAvailable} 
             />
             <ModalAggressorPerson
                 modalAggressor={modalAggressor}
-                setmodalAggressor={setmodalAggressor}
+                setmodalAggressor={setmodalAggressor} typeBitacora={bitacoraAggressor}
             />
             <ModalAggressorStaff
                 modalAggressorStaff={modalAggressorStaff}
-                setModalAggressorStaff={setmodalAggressorStaff}
+                setModalAggressorStaff={setmodalAggressorStaff} typeBitacora={bitacoraAggressor}
             />
             <Container>
                 <Form id="formNew" onSubmit={handleSubmit(onSubmit)}>
-                    <h4 className="text-center">Registro de incidencia</h4>
+                    <h4 className="text-center mb-5">Registro de incidencia</h4>
                     <IncidenceFormContainer>
                         <div className="d-flex flex-wrap gap-3">
                             <span className="fw-semibold">Origen de incidencia:</span>
@@ -182,6 +201,7 @@ const Registration = () => {
                                     name="radAgrressor"
                                     id="radpersonal"
                                     onClick={() => handleSelectModal(1)}
+                                    defaultChecked={!selectCheck}
                                 />
                                 <label htmlFor="radpersonal">Personal IE a escolares </label>
                             </div>
@@ -190,6 +210,7 @@ const Registration = () => {
                                     name="radAgrressor"
                                     id="radescolares"
                                     onClick={() => handleSelectModal(2)}
+                                    defaultChecked={selectCheck}
                                 />
                                 <label htmlFor="radescolares">Entre escolares </label>
                             </div>
@@ -213,8 +234,10 @@ const Registration = () => {
                                     <li className="item-direction item-container-direction item-container-header">
                                         <div className="attribute-title-direction">Nombres</div>
                                         <div className="attribute-title-direction">Apellidos</div>
+                                        <div className="attribute-title-direction">Turno</div>
                                         <div className="attribute-title-direction">Nivel</div>
                                         <div className="attribute-title-direction">Grado</div>
+                                        <div className="attribute-title-direction">Sección</div>
                                         <div className="attribute-title-direction">Acciones</div>
                                     </li>
                                     {attackendPersonCurrent?.map((person, index) => (
@@ -223,8 +246,11 @@ const Registration = () => {
                                             id={person?.alum_id}
                                             name={person?.alum_nombres}
                                             lastname={person?.alum_apellidos}
-                                            level={person?.alum_nivel}
-                                            grade={person?.alum_grado}
+                                            turno={person?.turno_descripcion}
+                                            level={person?.nivel_descripcion}
+                                            grade={person?.grado_descripcion}
+                                            section={person?.seccion_descripcion}
+                                            setAvailable={setAvailable}
                                         />
                                     ))}
                                 </ol>
@@ -239,28 +265,39 @@ const Registration = () => {
                                     Agregar presuntos agresores
                                 </button>
                             </div>
+                            
                             <div>
                                 <span className="fw-semibold">Persuntos agresores</span>
                                 <ol
                                     className="collection-direction collection-container-direction"
                                     style={{ paddingLeft: "0px" }}
                                 >
-                                    <li className="item-direction item-container-direction">
+                                    {selectAgrressor === 2 ? (
+                                        <li className="item-direction item-container-direction">
                                         <div className="attribute-title-direction">Nombres</div>
                                         <div className="attribute-title-direction">Apellidos</div>
                                         <div className="attribute-title-direction">Nivel</div>
                                         <div className="attribute-title-direction">Grado</div>
                                         <div className="attribute-title-direction">Acciones</div>
                                     </li>
+                                    ) : (
+                                        <li className="item-direction item-container-direction">
+                                        <div className="attribute-title-direction">Nombres</div>
+                                        <div className="attribute-title-direction">Apellidos</div>                                        
+                                        <div className="attribute-title-direction">Puesto</div>
+                                        <div className="attribute-title-direction">Acciones</div>
+                                    </li>
+                                    )}
+                                    
                                     {selectAgrressor === 1 ? (
                                         agrressorPersonCurrent?.map((person, index) => (
-                                            <AggressorPersonRow
+                                            <AggressorPersonStaffRow
                                                 key={index}
                                                 id={person?.peie_id}
                                                 name={person?.peie_nombres || ""}
                                                 lastname={person?.peie_apellidos || ""}
-                                                level={person?.tipo_personal_ie_descripcion || ""}
-                                                grade={person?.grade || ""}
+                                                tipoPersonal={person?.tipo_personal_ie_descripcion || ""}
+                                                setAvailable={setAvailable}
                                             />
                                         ))
                                     ) : (
@@ -271,8 +308,9 @@ const Registration = () => {
                                                     id={person?.alum_id}
                                                     name={person?.alum_nombres}
                                                     lastname={person?.alum_apellidos}
-                                                    level={person?.alum_nivel}
-                                                    grade={person?.alum_grado}
+                                                    level={person?.nivel_descripcion}
+                                                    grade={person?.grado_descripcion}
+                                                    setAvailable={setAvailable}
                                                 />
                                             ))
                                         )
@@ -283,10 +321,11 @@ const Registration = () => {
                         </div>
                         <div className="d-flex flex-wrap gap-2">
                             <InputContainer>
-                                <HintInput>Tipo de Incidencia</HintInput>
-                                <SelectOption id='optionTipo'
+                                <HintInput>Tipo de Incidencia *</HintInput>
+                                <SelectOption id='selectTipo'
                                     // name="incidenceName"
                                     {...register("selectTipo", {
+                                        required: "required"
                                     })}
                                     control={control}
                                 >
@@ -297,12 +336,14 @@ const Registration = () => {
                                         </option>
                                     ))}
                                 </SelectOption>
+                                {errors.selectTipo && <span className='text-danger' role="alert">Campo requerido</span>}
                             </InputContainer>
                             <InputContainer>
-                                <HintInput>Subtipo de Incidencia</HintInput>
-                                <SelectOption id='optionSubTipo'
+                                <HintInput>Subtipo de Incidencia *</HintInput>
+                                <SelectOption id='selectSubTipo'
                                     // name="incidenceName"
                                     {...register("selectSubTipo", {
+                                        required: "required"
                                     })}
                                     control={control}
                                 >
@@ -313,13 +354,15 @@ const Registration = () => {
                                         </option>
                                     ))}
                                 </SelectOption>
+                                {errors.selectSubTipo && <span className='text-danger' role="alert">Campo requerido</span>}
                             </InputContainer>
                             <InputContainer>
                                 <HintInput></HintInput>
-                                <HintInput>Motivos de Incidencia</HintInput>
-                                <SelectOption id='optionMotivo'
+                                <HintInput>Motivos de Incidencia *</HintInput>
+                                <SelectOption id='selectMotivo'
                                     // name="incidenceName"
                                     {...register("selectMotivo", {
+                                        required: "required"
                                     })}
                                     control={control}
                                 >
@@ -330,12 +373,14 @@ const Registration = () => {
                                         </option>
                                     ))}
                                 </SelectOption>
+                                {errors.selectMotivo && <span className='text-danger' role="alert">Campo requerido</span>}
                             </InputContainer>
                             <InputContainer>
-                                <HintInput>Lugar de Incidencia</HintInput>
-                                <SelectOption id='optionLugar'
+                                <HintInput>Lugar de Incidencia *</HintInput>
+                                <SelectOption id='selectLugar'
                                     // name="incidenceName"
                                     {...register("selectLugar", {
+                                        required: "required"
                                     })}
                                     control={control}
                                 >
@@ -346,6 +391,7 @@ const Registration = () => {
                                         </option>
                                     ))}
                                 </SelectOption>
+                                {errors.selectLugar && <span className='text-danger' role="alert">Campo requerido</span>}
                             </InputContainer>
                         </div>
                         <div className="d-flex flex-column">
@@ -357,13 +403,16 @@ const Registration = () => {
                                 />
                             </div>
                             <InputContainer>
-                                <HintInput>Detalle de la Incidencia</HintInput>
-                                <textarea
-                                    {...register("detalle")}
+                                <HintInput>Detalle de la Incidencia (opcional)</HintInput>
+                                <textarea maxLength="300"
+                                    {...register("detalle", {
+                                        required: "required"
+                                    })}
                                     control={control}
                                     placeholder="Detalle la incidencia"
                                 >
                                 </textarea>
+                                {errors.detalle && <span className='text-danger' role="alert">Campo requerido</span>}
                             </InputContainer>
                         </div>
                     </IncidenceFormContainer>

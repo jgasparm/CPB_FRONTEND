@@ -2,42 +2,25 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllAttackendPersons, setCurrentAttackendPersons, setCurrentBitacoraAttackendPersons } from '../../app/features/attackendPerson/attackendPerson';
 import ModalAttackendPerson from '../../components/modals/modalAttackendPerson';
+import ModalDetailsIncidence from '../../components/modals/modalDetailsIncidence';
 import BitacoraAttackendRow from '../../components/Tables/bitacoraAttackendRow';
 import BitacoraIncidentsFoundRow from '../../components/Tables/bitacoraIncidentsFoundRow';
+import CasesPotentialAttackendRow from '../../components/Tables/casesPotentialAttackendRow';
 import { Container, IncidenceFormContainer } from './style';
 
 const BitacoraIncidents = () => {
     const dispatch = useDispatch();
     // dispatch(setCurrentBitacoraAttackendPersons(null));
     const bitacoraAttackendPersonCurrent = useSelector(state => state.attackendPerson?.currentBitacoraAttackendPersons);
+    const incidenceAttackendPersonCurrent = useSelector(state => state.attackendPerson?.allIncidencesBitacoraAttackendPersons);
+    const casesPotentialAttackendRow = useSelector(state => state.attackendPerson?.allCpbBitacoraAttackendPersons);
     const [modalAttackend, setmodalAttackend] = useState(false);
     const [typeQuerie, settypeQuerie] = useState(0);
     const [available, setAvailable] = useState(false);
-    const [attackedPerson, setAttackedPerson] = useState([
-        // {
-        //     id: "1",
-        //     name: "Edwin Enrique",
-        //     lastname: "Torres Rojas",
-        //     level: "Seundaria",
-        //     grade: "Cuarto"
-        // }
-    ]);
-    const [incidencesPerson, setIncidentsPerson] = useState([
-        // {
-        //     id: "1",
-        //     typeIncident: "Física",
-        //     subTypeIncident: "Con lesiones",
-        //     reason: "Por su color de piel",
-        //     date: "20/08/2022 10:05am"
-        // },
-        // {
-        //     id: "2",
-        //     typeIncident: "Verbal",
-        //     subTypeIncident: "Condición social",
-        //     reason: "Por ser de provincia",
-        //     date: "22/08/2022 09:35am"
-        // }
-    ]);
+
+    // MODAL DETALLES DE INCIDENCIAS
+    const [stateDetails, setStateDetails] = useState(false);
+
     const handleModalAttackend = (e) => {
         e.preventDefault();
         dispatch(setAllAttackendPersons(null));
@@ -48,6 +31,7 @@ const BitacoraIncidents = () => {
 
     return (
         <>
+            <ModalDetailsIncidence stateDetails={stateDetails} setStatelDetails={setStateDetails} />
             <ModalAttackendPerson modalAttackend={modalAttackend}
                 setmodalAttackend={setmodalAttackend} typeQuerie={typeQuerie} setAvailable={setAvailable}/>
             <Container>
@@ -96,13 +80,58 @@ const BitacoraIncidents = () => {
                                     <div className="attribute-title-direction">Fecha y hora</div>
                                     <div className="attribute-title-direction">Acciones</div>
                                 </li>
-                                {incidencesPerson?.map((person, index) => (
+                                {incidenceAttackendPersonCurrent?.map((person, index) => (
                                     <BitacoraIncidentsFoundRow
                                         key={index}
-                                        typeIncident={person?.typeIncident}
-                                        subTypeIncident={person?.subTypeIncident}
-                                        reason={person?.reason}
-                                        date={person?.date}
+                                        id={person?.inci_id}
+                                        typeIncident={person?.tipo_incidencia}
+                                        subTypeIncident={person?.subtipo_incidencia}
+                                        reason={person?.motivo_incidencia}
+                                        date={person?.fecha_incidencia+" "+person?.hora_incidencia}
+                                        setStateDetails={setStateDetails}
+                                    />
+                                ))}
+                            </ol>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            <span className='fw-semibold'>Casos potenciales de Bullying</span>
+                            <ol className="collection-direction collection-container-direction" style={{ paddingLeft: '0px' }}>
+                                <li className="item-direction item-container-direction">
+                                    <div className="attribute-title-direction">Fecha y hora</div>
+                                    <div className="attribute-title-direction">Motivo</div>
+                                    <div className="attribute-title-direction">Acciones</div>
+                                </li>
+                                {casesPotentialAttackendRow?.map((cases, index) => (
+                                    <CasesPotentialAttackendRow
+                                        key={index}
+                                        dateHora={cases?.fecha_registro +" "+ cases?.hora_registro}
+                                        reason={cases?.cpbu_descripcion}
+                                    />
+                                ))}
+                            </ol>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            <div className='d-flex justify-content-between'>
+                                <span className='fw-semibold'>Resoluciones</span>
+                                <button className='btn btn-sm btn-secondary bg-gradient'
+                                    > Agregar resolución
+                                </button>
+                            </div>
+                            <ol className="collection-direction collection-container-direction" style={{ paddingLeft: '0px' }}>
+                                <li className="item-direction item-container-direction">
+                                    <div className="attribute-title-direction">Acción realizada</div>
+                                    <div className="attribute-title-direction">Resultados esperados</div>
+                                    <div className="attribute-title-direction">Acciones</div>
+                                </li>
+                                {casesPotentialAttackendRow?.map((cases, index) => (
+                                    <CasesPotentialAttackendRow
+                                        key={index}
+                                        dateHora={cases?.fecha_registro +" "+ cases?.hora_registro}
+                                        reason={cases?.cpbu_descripcion}
                                     />
                                 ))}
                             </ol>
